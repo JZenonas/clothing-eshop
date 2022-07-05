@@ -1,11 +1,18 @@
-import './categories.styles.scss'
-import MainDir from './components/main-dir/main-dir.component';
-import categories from './categories.json';
+import { Routes, Route } from 'react-router-dom'
+import NavBar from './routes/nav-bar/nav-bar.component';
+import Home from './routes/home/home.component'
+
+const Shop = () => <h1>Buy Now!</h1>
 
 const App = () => {
   return (
-    <MainDir categories={categories} />
-  )
+    <Routes>
+      <Route path='/' element={<NavBar />}>
+        <Route index element={<Home />} />
+        <Route path='/shop' element={<Shop />} />
+      </Route>
+    </Routes>
+  );
 }
 
 export default App;
