@@ -5,6 +5,7 @@ const SignIn = () => {
 
     const logGoogleUser = async () => {
         const { user } = await signInWithGooglePopup();
+        // eslint-disable-next-line no-unused-vars
         const userDocRef = await createUserDocument(user);
     };
     return (
