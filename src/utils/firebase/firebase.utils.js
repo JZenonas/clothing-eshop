@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB2et7VBpqwY8UdnJyeZtN3RzdsWmGHXYc",
@@ -13,23 +13,21 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
   prompt: "select_account"
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider)
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
 
 export const db = getFirestore();
 
-export const createUserDocument = async (userAuth) => {
+export const createUserDocument = async (userAuth, additionalInfo = {}) => {
+  if(!userAuth)return;
   const userDocRef = doc(db, 'users', userAuth.uid);
-  console.log(userDocRef)
 
   const userData = await getDoc(userDocRef);
-  console.log(userData)
-  console.log(userData.exists())
 
   if (!userData.exists()) {
     const { displayName, email } = userAuth;
@@ -38,12 +36,18 @@ export const createUserDocument = async (userAuth) => {
       await setDoc(userDocRef, {
         displayName,
         email,
-        createdAt
-      })
+        createdAt,
+        ...additionalInfo
+      });
     } catch (error) {
-      console.log('user not created', error.message)
-    }
-  }
+      console.log('user not created', error.message);
+    };
+  };
 
   return userDocRef;
-}
+};
+
+export const createAuthUserWithEmailAndPass = async (email, password) => {
+  if (!email || !password) return;
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
